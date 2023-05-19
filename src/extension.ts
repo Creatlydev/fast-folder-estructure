@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
+import { log } from "console";
 
 // Este método se llama cuando tu extensión se activa
 // Tu extensión se activa la primera vez que se ejecuta el comando
@@ -144,6 +145,11 @@ function createStructureFromTemplate(
   destinationFolderPath: string,
   callback: () => void
 ) {
+  // Obtener el valor de la propiedad para saber si desea reemplazar, omitir o preguntar sobre que hacer con los recursos que ya existen desde la configuración
+  const replaceOption = vscode.workspace
+    .getConfiguration("fast-folder-structure")
+    .get("ReplaceFileOrFolderExistents");
+
   let dirPath = templatePath.fsPath;
   const children = fs.readdirSync(dirPath, { withFileTypes: true });
   let index = 0;
@@ -162,7 +168,7 @@ function createStructureFromTemplate(
     if (stats.isFile()) {
       const fileContent = fs.readFileSync(filePath, "utf-8");
       const newFilePath = path.join(destinationFolderPath, child.name);
-      if (fs.existsSync(newFilePath)) {
+      if (fs.existsSync(newFilePath) && replaceOption === "Preguntar") {
         vscode.window
           .showQuickPick(["Reemplazar Archivo", "Omitir Archivo"], {
             placeHolder: `El archivo ${child.name} ya existe en esta ruta. Escoge una opción.`,
@@ -178,6 +184,10 @@ function createStructureFromTemplate(
               processNextChild();
             }
           });
+      } else if (replaceOption === "Omitir") {
+        // Omitir Archivo
+        index++;
+        processNextChild();
       } else {
         fs.writeFileSync(newFilePath, fileContent);
         index++;
@@ -185,7 +195,7 @@ function createStructureFromTemplate(
       }
     } else if (stats.isDirectory()) {
       const newFolderPath = path.join(destinationFolderPath, child.name);
-      if (fs.existsSync(newFolderPath)) {
+      if (fs.existsSync(newFolderPath) && replaceOption === "Preguntar") {
         // El folder ya existe en la carpeta de destino
         vscode.window
           .showQuickPick(["Reemplazar Folder", "Omitir este Folder"], {
@@ -204,11 +214,19 @@ function createStructureFromTemplate(
                 }
               );
             } else {
+              // Omitir Folder
               index++;
               processNextChild();
             }
           });
+      } else if (replaceOption === "Omitir") {
+        // Omitir Folder
+        index++;
+        processNextChild();
       } else {
+        if (replaceOption === 'Siempre') {
+          deleteFolderRecursive(newFolderPath);
+        }
         fs.mkdirSync(newFolderPath);
         createStructureFromTemplate(
           vscode.Uri.file(filePath),

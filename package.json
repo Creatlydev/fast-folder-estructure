@@ -47,10 +47,15 @@
     "configuration": {
       "title": "Fast Folder Structure",
       "properties": {
-        "fast-folder-structure.fileOrFolderExistents": {
+        "fast-folder-structure.ReplaceFileOrFolderExistents": {
           "type": "string",
-          "description": "",
-          "default": "Preguntar"
+          "enum": [
+            "Siempre",
+            "Omitir",
+            "Preguntar"
+          ],
+          "default": "Preguntar",
+          "description": "Reemplazar los archivos o folder que estan en la misma ruta"
         }
       }
     }
