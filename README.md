@@ -34,7 +34,8 @@ Actualmente no hay problemas conocidos.
 
 ### 1.1.0
 
-- Añadida la funcionalidad de plantillas personalizadas.
+- Añadida la funcionalidad de crear tus propias plantillas personalizadas.
+- Añadida la opcion de escoger un nombre para tu plantilla personalizada.
 - Mejora de la interfaz de usuario para la selección de plantillas.
 - Mejoras en la gestión de errores y notificaciones.
 

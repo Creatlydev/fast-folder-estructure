@@ -2,7 +2,7 @@
   "name": "fast-folder-structure",
   "displayName": "Fast Folder Structure",
   "description": "Create Quick and Custom Folder Structures",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.78.0"
   },
