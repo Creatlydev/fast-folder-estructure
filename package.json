@@ -15,23 +15,28 @@
     "menus": {
       "explorer/context": [
           {
-              "command": "fast-folder-structure.createTemplate",
+              "command": "fast-folder-structure.selectTemplate",
+              "when": "explorerResourceIsFolder || resourceLangId == 'file'",
               "group": "Create"
+          },
+          {
+            "command": "fast-folder-structure.convertToTemplate",
+            "group": "Create",
+            "title": "Convertir a plantilla"
           }
       ],
       "explorer/file/context": [],
-      "explorer/folder/context": [
-          {
-              "command": "fast-folder-structure.createTemplate",
-              "group": "Create"
-          }
-      ]
+      "explorer/folder/context": []
   },
     "commands": [
       {
-        "command": "fast-folder-structure.createTemplate",
+        "command": "fast-folder-structure.selectTemplate",
         "title": " Crear Plantilla",
         "category": "Fast Folder Structure"
+      },
+      {
+        "command": "fast-folder-structure.convertToTemplate",
+        "title": "Convertir a Plantilla"
       }
     ]
   },

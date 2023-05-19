@@ -10,21 +10,20 @@ import * as path from 'path';
 export function activate(context: vscode.ExtensionContext) {
 
 	// IDs constantes
-	const createTemplateComandId = 'fast-folder-structure.createTemplate';
+	const selectTemplateComandId = 'fast-folder-structure.selectTemplate';
+	const convertToTemplateComandId = 'fast-folder-structure.convertToTemplate';
+	// Ruta de la carpeta de plantillas
+	const templatesFolderPath = vscode.Uri.joinPath(context.extensionUri, 'Templates');
 
 	// Utiliza la consola para imprimir información de diagnóstico (console.log) y errores (console.error)
 	// Esta línea de código se ejecutará solo una vez cuando tu extensión se active
 	console.log('¡Felicitaciones, tu extensión "fast-folder-structure" está activa ahora!');
-
 	// El comando se ha definido en el archivo package.json
 	// Ahora proporciona la implementación del comando con registerCommand
 	// El parámetro commandId debe coincidir con el campo command en package.json
-	let createTemplate = vscode.commands.registerCommand(createTemplateComandId, (resource: vscode.Uri) => {
-		// Ruta de la carpeta de plantillas
-		const templatesFolderPath = vscode.Uri.joinPath(context.extensionUri, 'Templates');
+	const selectTemplate = vscode.commands.registerCommand(selectTemplateComandId, (resource: vscode.Uri) => {
 
-		// Comprueba si el recurso es válido y su esquema es "file".
-		// Luego, path.basename se utiliza para obtener el nombre de la carpeta a partir de la ruta completa.
+		// Comprueba si el recurso es válido y su esquema es "file". 
 		if (resource && resource.scheme === 'file') {
 			var destinationFolderPath = resource.fsPath;
 			showQuickPick(templatesFolderPath, destinationFolderPath);
@@ -41,11 +40,25 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	context.subscriptions.push(createTemplate);
+	const convertToTemplate = vscode.commands.registerCommand(convertToTemplateComandId, async (resource: vscode.Uri) => {
+		// Lógica para convertir a plantilla
+		const name = await vscode.window.showInputBox({
+			prompt: 'Ingresa un nombre para tu plantilla ó (deja en blanco para dejar el nombre del folder o archivo seleccionado)',
+			placeHolder: 'Nombre de la plantilla'
+		});
+
+		if (name !== undefined) {
+			convertFileOrFolderToTemplate(resource.fsPath, name, templatesFolderPath);
+		}
+	  });
+
+	context.subscriptions.push(selectTemplate, convertToTemplate);
 }
 
 // Esta funcion se llama cuando tu extensión se desactiva
 export function deactivate() {}
+
+
 
 // Muestra el cuadro de selección rápida para que el usuario elija una plantilla
 function showQuickPick(templatesFolderPath: vscode.Uri, destinationFolderPath: string) {
@@ -72,24 +85,65 @@ function getTemplateNames(templatesFolderPath: vscode.Uri): string[] {
 	return templateDirectories;
 }
 
+
 // Esta funcion se llama para crear la estructura de carpetas
-function createStructureFromTemplate(templateFolderPath: vscode.Uri, destinationFolderPath: string) {
-	const templateFiles = fs.readdirSync(templateFolderPath.fsPath, { withFileTypes: true });
+function createStructureFromTemplate(templatePath: vscode.Uri, destinationFolderPath: string) {
+	// const templateFiles = fs.readdirSync(templatePath.fsPath, { withFileTypes: true });
+	const stats = fs.statSync(templatePath.fsPath);
+	let filename = path.basename(templatePath.fsPath);
+	let filePath = path.join(templatePath.fsPath, filename);
 
-	templateFiles.forEach(file => {
-		const filePath = path.join(templateFolderPath.fsPath, file.name);
-		const stats = fs.statSync(filePath);
+	if (stats.isFile()) {
+		const fileContent = fs.readFileSync(filePath, 'utf-8');
+		const newFilePath = path.join(destinationFolderPath, filename);
+		fs.writeFileSync(newFilePath, fileContent);
 
-		if (stats.isFile()) {
-			const fileContent = fs.readFileSync(filePath, 'utf-8');
-			const newFilePath = path.join(destinationFolderPath, file.name);
+	} else if (stats.isDirectory()) {
+		let dirPath = templatePath.fsPath;
+		fs.readdirSync(dirPath, {withFileTypes: true}).forEach(child => {
+			const filePath = path.join(dirPath, child.name);
+			const stats = fs.statSync(filePath);
+	
+			if (stats.isFile()) {
+				const fileContent = fs.readFileSync(filePath, 'utf-8');
+				const newFilePath = path.join(destinationFolderPath, child.name);
+	
+				fs.writeFileSync(newFilePath, fileContent);
+			} else if (stats.isDirectory()) {
+				const newFolderPath = path.join(destinationFolderPath, child.name);
+				fs.mkdirSync(newFolderPath);
+	
+				createStructureFromTemplate(vscode.Uri.file(filePath), newFolderPath);
+			}
+		});
+	}
+}
 
-			fs.writeFileSync(newFilePath, fileContent);
-		} else if (stats.isDirectory()) {
-			const newFolderPath = path.join(destinationFolderPath, file.name);
-			fs.mkdirSync(newFolderPath);
 
-			createStructureFromTemplate(vscode.Uri.file(filePath), newFolderPath);
+// Función para copiar un archivo o carpeta a una ubicación específica
+function convertFileOrFolderToTemplate(folderPathConvertToTemplate: string, name: string, templatesPath: vscode.Uri): void {
+    const stats = fs.statSync(folderPathConvertToTemplate);
+
+    if (stats.isFile()) {
+        // Si es un archivo, copia el archivo a la carpeta de destino
+        let fileName = path.basename(folderPathConvertToTemplate);
+		if (path.basename(templatesPath.fsPath) === 'Templates' && name) {
+			let partsFilename = fileName.split('.');
+			fileName = name + '.' + partsFilename[partsFilename.length - 1];
 		}
-	});
+        const destPath = path.join(templatesPath.fsPath, fileName);
+        fs.copyFileSync(folderPathConvertToTemplate, destPath);
+    } else if (stats.isDirectory()) {
+        // Si es una carpeta, copia toda la carpeta a la carpeta de destino
+		let folderName = path.basename(folderPathConvertToTemplate);
+		if (path.basename(templatesPath.fsPath) === 'Templates') {
+			folderName = name || path.basename(folderPathConvertToTemplate);
+		}
+        let newTemplatePath = path.join(templatesPath.fsPath, folderName);
+        fs.mkdirSync(newTemplatePath);
+        fs.readdirSync(folderPathConvertToTemplate).forEach(child => {
+            const childUri = vscode.Uri.file(path.join(folderPathConvertToTemplate, child));
+            convertFileOrFolderToTemplate(childUri.fsPath, name, vscode.Uri.file(newTemplatePath));
+        });
+    }
 }
