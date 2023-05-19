@@ -16,10 +16,9 @@ export function activate(context: vscode.ExtensionContext) {
     "Templates"
   );
 
-  // Utiliza la consola para imprimir información de diagnóstico (console.log) y errores (console.error)
   // Esta línea de código se ejecutará solo una vez cuando tu extensión se active
-  console.log(
-    '¡Felicitaciones, tu extensión "fast-folder-structure" está activa ahora!'
+  vscode.window.showInformationMessage(
+    "Fast Folder Structure Ahora esta activa"
   );
   // El comando se ha definido en el archivo package.json
   // Ahora proporciona la implementación del comando con registerCommand
@@ -58,11 +57,23 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       if (name !== undefined) {
-        convertFileOrFolderToTemplate(
-          resource.fsPath,
-          name,
-          templatesFolderPath
-        );
+        try {
+          if (
+            convertFileOrFolderToTemplate(
+              resource.fsPath,
+              name,
+              templatesFolderPath
+            ) !== "FoundResourceName"
+          ) {
+            vscode.window.showInformationMessage(
+              "¡Felicitaciones acabas de crear una plantilla"
+            );
+          }
+        } catch (error) {
+          vscode.window.showInformationMessage(
+            "Ha ocurrido un error al Convertir a Plantilla"
+          );
+        }
       }
     }
   );
@@ -97,7 +108,7 @@ function showQuickPick(
           destinationFolderPath,
           () => {
             vscode.window.showInformationMessage(
-              "¡Felicitaciones! Has creado tu plantilla. ¡Let's Go!"
+              "¡Felicitaciones! Has creado tu plantilla."
             );
           }
         );
@@ -206,25 +217,30 @@ function convertFileOrFolderToTemplate(
   folderPathConvertToTemplate: string,
   name: string,
   templatesPath: vscode.Uri
-): void {
+) {
   const stats = fs.statSync(folderPathConvertToTemplate);
+  let resourceName = path.basename(folderPathConvertToTemplate);
+
+  if (
+    path.basename(templatesPath.fsPath) === "Templates" &&
+    fs.existsSync(
+      path.join(templatesPath.fsPath, (name && isSpace(name)) || resourceName)
+    )
+  ) {
+    console.log(`Ya existe plantilla con el nombre de ${resourceName}`);
+    return "FoundResourceName";
+  }
 
   if (stats.isFile()) {
     // Si es un archivo, copia el archivo a la carpeta de destino
-    let fileName = path.basename(folderPathConvertToTemplate);
-    if (path.basename(templatesPath.fsPath) === "Templates" && name) {
-      let partsFilename = fileName.split(".");
-      fileName = name + "." + partsFilename[partsFilename.length - 1];
-    }
-    const destPath = path.join(templatesPath.fsPath, fileName);
+    const destPath = path.join(templatesPath.fsPath, resourceName);
     fs.copyFileSync(folderPathConvertToTemplate, destPath);
   } else if (stats.isDirectory()) {
     // Si es una carpeta, copia toda la carpeta a la carpeta de destino
-    let folderName = path.basename(folderPathConvertToTemplate);
     if (path.basename(templatesPath.fsPath) === "Templates") {
-      folderName = name || path.basename(folderPathConvertToTemplate);
+      resourceName = (name && isSpace(name)) || resourceName;
     }
-    let newTemplatePath = path.join(templatesPath.fsPath, folderName);
+    let newTemplatePath = path.join(templatesPath.fsPath, resourceName);
     fs.mkdirSync(newTemplatePath);
     fs.readdirSync(folderPathConvertToTemplate).forEach((child) => {
       const childUri = vscode.Uri.file(
@@ -249,4 +265,13 @@ function deleteFolderRecursive(folderPath: string) {
     }
   });
   fs.rmdirSync(folderPath);
+}
+
+function isSpace(str: string) {
+  let longStr = str.trim().length === 0;
+  if (longStr) {
+    return undefined;
+  }
+
+  return str.trim();
 }
