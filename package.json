@@ -26,6 +26,7 @@
           {
             "command": "fast-folder-structure.convertToTemplate",
             "group": "Create",
+            "when": "explorerResourceIsFolder || resourceLangId == 'file'",
             "title": "Convertir a plantilla"
           }
       ],
@@ -42,7 +43,17 @@
         "command": "fast-folder-structure.convertToTemplate",
         "title": "Convertir a Plantilla"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Fast Folder Structure",
+      "properties": {
+        "fast-folder-structure.fileOrFolderExistents": {
+          "type": "string",
+          "description": "",
+          "default": "Preguntar"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
