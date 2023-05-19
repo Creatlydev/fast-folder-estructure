@@ -1,6 +1,6 @@
 {
   "name": "fast-folder-structure",
-  "displayName": "fast-folder-structure",
+  "displayName": "Fast Folder Structure",
   "description": "Create Quick and Custom Folder Structures",
   "version": "0.0.1",
   "engines": {
@@ -11,6 +11,10 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "galleryBanner": {
+    "color": "#272729",
+    "theme": "dark"
+  },
   "contributes": {
     "menus": {
       "explorer/context": [
