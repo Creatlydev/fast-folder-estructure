@@ -18,8 +18,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Esta línea de código se ejecutará solo una vez cuando tu extensión se active
   vscode.window.showInformationMessage(
-    "Fast Folder Structure Ahora esta activa"
+    "Fast Folder Structure ahora está activa"
   );
+
   // El comando se ha definido en el archivo package.json
   // Ahora proporciona la implementación del comando con registerCommand
   // El parámetro commandId debe coincidir con el campo command en package.json
@@ -66,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
             ) !== "FoundResourceName"
           ) {
             vscode.window.showInformationMessage(
-              "¡Felicitaciones acabas de crear una plantilla"
+              "¡Felicitaciones, acabas de crear una plantilla!"
             );
           }
         } catch (error) {
@@ -81,10 +82,14 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(selectTemplate, convertToTemplate);
 }
 
-// Esta funcion se llama cuando tu extensión se desactiva
+// Esta función se llama cuando tu extensión se desactiva
 export function deactivate() {}
 
-// Muestra el cuadro de selección rápida para que el usuario elija una plantilla
+/**
+ * Muestra el cuadro de selección rápida para que el usuario elija una plantilla
+ * @param templatesFolderPath - Ruta donde se guardan las plantillas de la extension
+ * @param destinationFolderPath - Ruta donde de destino
+ */
 function showQuickPick(
   templatesFolderPath: vscode.Uri,
   destinationFolderPath: string
@@ -101,8 +106,6 @@ function showQuickPick(
         );
 
         // Llama a la funcion para crear la estructura utilizando la plantilla seleccionada y la carpeta de destino
-        // createStructureFromTemplate(templateFolderPath, destinationFolderPath);
-        // vscode.window.showInformationMessage('¡Felicitaciones! Has creado tu plantilla. ¡Let\'s Go!');
         createStructureFromTemplate(
           templateFolderPath,
           destinationFolderPath,
@@ -117,6 +120,11 @@ function showQuickPick(
 }
 
 // Obtiene los nombres de las plantillas desde las carpetas dentro de la carpeta de plantillas
+/**
+ *
+ * @param templatesFolderPath - Ruta donde se guardan las plantillas de la extension
+ * @returns {string[]} - array de strings con los nombres de las plantillas disponibles
+ */
 function getTemplateNames(templatesFolderPath: vscode.Uri): string[] {
   const templateDirectories = fs
     .readdirSync(templatesFolderPath.fsPath, { withFileTypes: true })
@@ -125,7 +133,12 @@ function getTemplateNames(templatesFolderPath: vscode.Uri): string[] {
   return templateDirectories;
 }
 
-// Esta funcion se llama para crear la estructura de carpetas
+/**
+ * Esta función se llama para crear la estructura de carpetas
+ * @param templatePath - Ruta donde se guardan las plantilla de la extension
+ * @param destinationFolderPath - Ruta en donde se creara el contenido de la plantilla seleccionada
+ * @param callback - Funcion que se llama al crear todos los recursos de la plantilla
+ */
 function createStructureFromTemplate(
   templatePath: vscode.Uri,
   destinationFolderPath: string,
@@ -152,7 +165,7 @@ function createStructureFromTemplate(
       if (fs.existsSync(newFilePath)) {
         vscode.window
           .showQuickPick(["Reemplazar Archivo", "Omitir Archivo"], {
-            placeHolder: `El archivo ${child.name} ya existe en esta ruta, Escoge una opción`,
+            placeHolder: `El archivo ${child.name} ya existe en esta ruta. Escoge una opción.`,
           })
           .then((option) => {
             if (option === "Reemplazar Archivo") {
@@ -176,7 +189,7 @@ function createStructureFromTemplate(
         // El folder ya existe en la carpeta de destino
         vscode.window
           .showQuickPick(["Reemplazar Folder", "Omitir este Folder"], {
-            placeHolder: `El folder ${child.name} ya existe en esta ruta, Escoge una opción`,
+            placeHolder: `El folder ${child.name} ya existe en esta ruta. Escoge una opción.`,
           })
           .then((option) => {
             if (option === "Reemplazar Folder") {
@@ -212,7 +225,13 @@ function createStructureFromTemplate(
   processNextChild();
 }
 
-// Función para copiar un archivo o carpeta a una ubicación específica
+/**
+ * Función para copiar un archivo o carpeta a una ubicación específica
+ * @param folderPathConvertToTemplate - Folder que el usuario convertira a una plantilla
+ * @param name - Para darle un nombre a la plantilla
+ * @param templatesPath - Ruta donde se guardan todas las plantillas de la extension
+ * @returns {string | undefined} - La cadena de texto 'FoundResourceName' si existe una plantilla con el mismo nombre o undefined
+ */
 function convertFileOrFolderToTemplate(
   folderPathConvertToTemplate: string,
   name: string,
@@ -227,7 +246,7 @@ function convertFileOrFolderToTemplate(
       path.join(templatesPath.fsPath, (name && isSpace(name)) || resourceName)
     )
   ) {
-    console.log(`Ya existe plantilla con el nombre de ${resourceName}`);
+    console.log(`Ya existe una plantilla con el nombre ${resourceName}`);
     return "FoundResourceName";
   }
 
@@ -255,6 +274,10 @@ function convertFileOrFolderToTemplate(
   }
 }
 
+/**
+ * Elimina de forma recursiva una carpeta y todos sus contenidos.
+ * @param folderPath - La ruta de la carpeta a eliminar.
+ */
 function deleteFolderRecursive(folderPath: string) {
   fs.readdirSync(folderPath).forEach((file) => {
     const filePath = path.join(folderPath, file);
@@ -267,6 +290,11 @@ function deleteFolderRecursive(folderPath: string) {
   fs.rmdirSync(folderPath);
 }
 
+/**
+ * Verifica si una cadena de texto está compuesta únicamente por espacios en blanco.
+ * @param {string} str - La cadena de texto a verificar.
+ * @returns {string | undefined} - La cadena de texto sin espacios en blanco o undefined si la cadena está compuesta solo por espacios.
+ */
 function isSpace(str: string) {
   let longStr = str.trim().length === 0;
   if (longStr) {
