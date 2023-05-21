@@ -18,21 +18,21 @@
   "contributes": {
     "menus": {
       "explorer/context": [
-          {
-              "command": "fast-folder-structure.selectTemplate",
-              "when": "explorerResourceIsFolder || resourceLangId == 'file'",
-              "group": "Create"
-          },
-          {
-            "command": "fast-folder-structure.convertToTemplate",
-            "group": "Create",
-            "when": "explorerResourceIsFolder || resourceLangId == 'file'",
-            "title": "Convertir a plantilla"
-          }
+        {
+          "command": "fast-folder-structure.selectTemplate",
+          "when": "explorerResourceIsFolder || resourceLangId == 'file'",
+          "group": "A-Create"
+        },
+        {
+          "command": "fast-folder-structure.convertToTemplate",
+          "group": "A-Create",
+          "when": "explorerResourceIsFolder || resourceLangId == 'file'",
+          "title": "Convertir a plantilla"
+        }
       ],
       "explorer/file/context": [],
       "explorer/folder/context": []
-  },
+    },
     "commands": [
       {
         "command": "fast-folder-structure.selectTemplate",
@@ -41,7 +41,8 @@
       },
       {
         "command": "fast-folder-structure.convertToTemplate",
-        "title": "Convertir a Plantilla"
+        "title": " Convertir a Plantilla",
+        "category": "Fast Folder Structure"
       }
     ],
     "configuration": {
