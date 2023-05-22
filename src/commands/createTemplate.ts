@@ -18,27 +18,27 @@ export const createTemplate = async (
     } else {
       destinationFolderPath = workspaceFolders[0].uri;
     }
-
-    // Abrir lista de templates
-    await promptForSelectTemplate(pathFolderTemplates).then((option) => {
-      if (option) {
-        let templateName = option.label;
-        let pathFolderTemplateSelected = vscode.Uri.file(
-          path.join(pathFolderTemplates.fsPath, templateName)
-        );
-        createStructureFromTemplate(
-          pathFolderTemplateSelected,
-          destinationFolderPath.fsPath
-        );
-        vscode.window.showInformationMessage(
-          `Creacion satisfactoria | Template '${templateName}'`
-        );
-      } else {
-        vscode.window.showErrorMessage("No se selecciono Template");
-        return;
-      }
-    });
   }
+
+  // Abrir lista de templates
+  await promptForSelectTemplate(pathFolderTemplates).then((option) => {
+    if (option) {
+      let templateName = option.label;
+      let pathFolderTemplateSelected = vscode.Uri.file(
+        path.join(pathFolderTemplates.fsPath, templateName)
+      );
+      createStructureFromTemplate(
+        pathFolderTemplateSelected,
+        destinationFolderPath.fsPath
+      );
+      vscode.window.showInformationMessage(
+        `Creacion satisfactoria | Template '${templateName}'`
+      );
+    } else {
+      vscode.window.showErrorMessage("No se selecciono Template");
+      return;
+    }
+  });
 };
 
 /**
