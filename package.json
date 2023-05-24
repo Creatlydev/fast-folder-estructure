@@ -4,6 +4,8 @@
   "description": "Create Quick and Custom Folder Structures",
   "version": "1.1.0",
   "icon": "images/icon-theme-light.png",
+  "publisher": "Creatlydev",
+  "license": "SEE LICENSE IN LICENSE.md",
   "author": {
     "name": "Samir Yangua Ruiz"
   },
