@@ -3,12 +3,27 @@
   "displayName": "Fast Folder Structure",
   "description": "Create Quick and Custom Folder Structures",
   "version": "1.1.0",
+  "icon": "images/icon-theme-light.png",
+  "author": {
+    "name": "Samir Yangua Ruiz"
+  },
   "engines": {
     "vscode": "^1.78.0"
   },
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "Templates",
+    "Template generator",
+    "Folder template",
+    "Structure template",
+    "Clean code folders",
+    "Fast Folder Structure"
+  ],"repository": {
+    "type": "git",
+    "url": "https://github.com/Creatlydev/fast-folder-estructure"
+  },
   "activationEvents": [],
   "main": "./dist/extension.js",
   "galleryBanner": {
@@ -36,17 +51,30 @@
     "commands": [
       {
         "command": "fast-folder-structure.selectTemplate",
-        "title": " Crear Plantilla",
+        "title": " Crear Template",
         "category": "Fast Folder Structure",
         "icon": {
-          "dark": "",
-          "light": ""
+          "dark": "./images/icon-theme-dark.png",
+          "light": "./images/icon-theme-light.png"
         }
       },
       {
         "command": "fast-folder-structure.convertToTemplate",
-        "title": " Convertir a Plantilla",
-        "category": "Fast Folder Structure"
+        "title": " Convertir a Template",
+        "category": "Fast Folder Structure",
+        "icon": {
+          "dark": "./images/icon-theme-dark.png",
+          "light": "./images/icon-theme-light.png"
+        }
+      },
+      {
+        "command": "fast-folder-structure.removeTemplate",
+        "title": " Eliminar Template",
+        "category": "Fast Folder Structure",
+        "icon": {
+          "dark": "./images/icon-theme-dark.png",
+          "light": "./images/icon-theme-light.png"
+        }
       }
     ]
   },
