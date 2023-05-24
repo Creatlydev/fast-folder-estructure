@@ -1,4 +1,9 @@
-import { OpenDialogOptions, QuickPickItem, window } from "vscode";
+import {
+  InputBoxOptions,
+  OpenDialogOptions,
+  QuickPickItem,
+  window,
+} from "vscode";
 
 import { getTemplatesNames } from "./getTemplatesNames";
 import * as vscode from "vscode";
@@ -29,19 +34,12 @@ export async function promptForSelectTemplate(pathFolderTemplates: vscode.Uri) {
   allTemplatesNames.forEach((name) => {
     templatesNames.push({
       label: name,
+      description: "Igual para todos",
+      detail: "$(x) Eliminar plantilla",
     });
   });
 
   return window.showQuickPick(templatesNames, {
     placeHolder: "Selecciona una Template",
   });
-}
-
-export async function promtForConfirmRemoveTemplate(templateName: string) {
-  //
-  return window.showWarningMessage(
-    `¿Estás seguro de que deseas eliminar | Template '${templateName}' ?`,
-    { modal: true },
-    "Confirmar"
-  );
 }

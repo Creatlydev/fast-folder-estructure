@@ -1,7 +1,7 @@
 // El módulo 'vscode' contiene la API de extensibilidad de VS Code
 // Importa el módulo y haz referencia a él con el alias 'vscode' en tu código a continuación
 import * as vscode from "vscode";
-import { convertToTemplate, createTemplate, removeTemplate } from "./commands";
+import { convertToTemplate, createTemplate } from "./commands";
 
 // Este método se llama cuando tu extensión se activa
 // Tu extensión se activa la primera vez que se ejecuta el comando
@@ -9,7 +9,6 @@ export function activate(context: vscode.ExtensionContext) {
   // Commands ids
   const CREATETEMPLATECOMANDID = "fast-folder-structure.selectTemplate";
   const CONVERTTOTEMPLATECOMANDID = "fast-folder-structure.convertToTemplate";
-  const REMOVETEMPLATE = "fast-folder-structure.removeTemplate";
   // Ruta de la carpeta de plantillas
   const pathFolderTemplates = vscode.Uri.joinPath(
     context.extensionUri,
@@ -33,23 +32,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   const _convertToTemplate = vscode.commands.registerCommand(
     CONVERTTOTEMPLATECOMANDID,
-    (pathFolder: vscode.Uri) => {
-      convertToTemplate(pathFolder, pathFolderTemplates);
+    (uri: vscode.Uri) => {
+      convertToTemplate(uri, pathFolderTemplates);
     }
   );
 
-  const _removeTemplate = vscode.commands.registerCommand(
-    REMOVETEMPLATE,
-    () => {
-      removeTemplate(pathFolderTemplates);
-    }
-  );
-
-  context.subscriptions.push(
-    _createTemplate,
-    _convertToTemplate,
-    _removeTemplate
-  );
+  context.subscriptions.push(_createTemplate, _convertToTemplate);
 }
 
 // Esta función se llama cuando tu extensión se desactiva
