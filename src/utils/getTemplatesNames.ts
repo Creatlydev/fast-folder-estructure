@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 
-
 /**
  * Obtiene los nombres de las plantillas desde las carpetas dentro de la carpeta de plantillas
  * @param pathFolderTemplates - Ruta donde se guardan las plantillas de la extension
@@ -10,8 +9,6 @@ import * as fs from "fs";
 export const getTemplatesNames = (
   pathFolderTemplates: vscode.Uri
 ): string[] => {
-  console.log(`pathFolderTemplates= ${pathFolderTemplates}`);
-  
   const templateDirectories = fs
     .readdirSync(pathFolderTemplates.fsPath, { withFileTypes: true })
     .map((dirent) => dirent.name);
